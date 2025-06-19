@@ -12,16 +12,38 @@ const RegisterForm = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = e => {
-    e.preventDefault();
-    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
-      setMessage('All fields are required.');
-    } else if (formData.password !== formData.confirmPassword) {
-      setMessage('Passwords do not match.');
-    } else {
-      setMessage('Registration successful!');
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
+    setMessage('All fields are required.');
+  } else if (formData.password !== formData.confirmPassword) {
+    setMessage('Passwords do not match.');
+  } else {
+    try {
+      const res = await fetch('http://localhost:5000/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setMessage('Registration successful! Redirecting to login...');
+        setTimeout(() => window.location.href = '/', 2000);
+      } else {
+        setMessage(data.error);
+      }
+    } catch (err) {
+      setMessage('Server error. Try again later.');
     }
-  };
+  }
+};
+
 
   return (
     <div className="form-container">

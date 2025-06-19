@@ -7,18 +7,30 @@ const LoginForm = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+    const handleLogin = async (e) => {
     e.preventDefault();
-    if (email === 'test@example.com' && password === '123456') {
-      alert('Login successful!');
-    } else {
-      setError('Invalid email or password.');
+    try {
+      const res = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        navigate(`/welcome/${data.username}`); // redirect to welcome page with username
+      } else {
+        setError(data.error);
+      }
+    } catch (err) {
+      setError('Server error. Try again later.');
     }
   };
 
-  const goToRegister = () => {
-    navigate('/register');
-  };
+    const goToRegister = () => {
+      navigate('/register');
+    };
 
   return (
     <div className="form-container">
@@ -57,4 +69,6 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+
+
+export default LoginForm
